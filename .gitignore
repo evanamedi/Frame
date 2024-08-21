@@ -1,0 +1,23 @@
+# Compiled object files
+*.o
+*.obj
+
+# Executable files
+*.exe
+*.out
+*.a
+*.so
+*.dylib
+
+# CMake files
+CMakeLists.txt.user
+
+# Backup files
+*~
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Generated files
+/build/
