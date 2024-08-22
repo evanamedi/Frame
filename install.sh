@@ -27,7 +27,7 @@ clone_repository() {
 
 	if [ -d "$LOCAL_REPO_DIR" ]; then
 		echo "Removing existing directory: $LOCAL_REPO_DIR"
-		rm rf "$LOCAL_REPO_DIR"
+		rm -rf "$LOCAL_REPO_DIR"
 	fi
 
 	echo "Cloning repository to $LOCAL_REPO_DIR..."
