@@ -2,43 +2,48 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -Iinclude
 
 OBJDIR = build
-TEST_OBJDIR = build_tests
 TEST_DIR = test_dir
 
-SRCS = $(wildcard src/*.c)
-OBJS = $(patsubst src/%.c,$(OBJDIR)/%.o,$(SRCS))
+# capture all .c files in src and src/commands
+SRCS = $(wildcard src/*.c) $(wildcard src/commands/*.c)
+OBJS = $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(SRCS)))
 TARGET = frame
 
+# test sources
 TEST_SRCS = $(filter-out src/main.c, $(SRCS)) $(wildcard tests/*.c)
-TEST_OBJS = $(patsubst src/%.c,$(TEST_OBJDIR)/%.o,$(filter-out tests/%.c, $(TEST_SRCS)))
-TEST_OBJS += $(patsubst tests/%.c,$(TEST_OBJDIR)/%.o,$(wildcard tests/*.c))
-TEST_TARGET = $(TEST_OBJDIR)/run_tests
+TEST_OBJS = $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(TEST_SRCS)))
+TEST_TARGET = $(OBJDIR)/run_tests
 
 all: $(TARGET) $(TEST_TARGET) run
 
-$(OBJDIR)/%.o: src/%.c
+# create directories
+$(OBJDIR):
 	@mkdir -p $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TEST_OBJDIR)/%.o: tests/%.c
-	@mkdir -p $(TEST_OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+# compile source files to object files in OBJDIR
+$(OBJDIR)/%.o: src/%.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(notdir $@)
 
-$(TEST_OBJDIR)/%.o: src/%.c
-	@mkdir -p $(TEST_OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJDIR)/%.o: src/commands/%.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(notdir $@)
 
+# compile test source files to object files in OBJDIR
+$(OBJDIR)/%.o: tests/%.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(notdir $@)
+
+# link the object files to create the final executable
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
+# link the object files for tests
 $(TEST_TARGET): $(TEST_OBJS)
-	@mkdir -p $(TEST_OBJDIR)
 	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_OBJS)
 
+# run tests in a separate test directory
 run: $(TEST_TARGET)
 	@mkdir -p $(TEST_DIR)
 	./$(TEST_TARGET) $(TEST_DIR)
 	@rm -rf $(TEST_DIR)
 
 clean:
-	rm -rf $(TARGET) $(OBJDIR) $(TEST_OBJDIR) $(TEST_DIR)
+	rm -rf $(TARGET) $(OBJDIR) $(TEST_DIR)
