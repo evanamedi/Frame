@@ -4,38 +4,39 @@ CFLAGS = -Wall -Wextra -std=c99 -Iinclude
 OBJDIR = build
 TEST_DIR = test_dir
 
-# capture all .c files in src and src/commands
-SRCS = $(wildcard src/*.c) $(wildcard src/commands/*.c)
-OBJS = $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(SRCS)))
-TARGET = frame
+# find all .c files in src and its subdirectories
+SRCS = $(shell find src -name '*.c')
+# create corresponding .o file names in build directory, preserving paths
+OBJS = $(SRCS:src/%.c=$(OBJDIR)/%.o)
 
 # test sources
 TEST_SRCS = $(filter-out src/main.c, $(SRCS)) $(wildcard tests/*.c)
-TEST_OBJS = $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(TEST_SRCS)))
+TEST_OBJS = $(TEST_SRCS:src/%.c=$(OBJDIR)/%.o)
+
+TARGET = frame
 TEST_TARGET = $(OBJDIR)/run_tests
 
 all: $(TARGET) $(TEST_TARGET) run
 
-# create directories
+# ensure the build directory exists
 $(OBJDIR):
 	@mkdir -p $(OBJDIR)
 
-# compile source files to object files in OBJDIR
-$(OBJDIR)/%.o: src/%.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(notdir $@)
+# ensure subdirectories in build/ mirror src/
+$(OBJDIR)/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/%.o: src/commands/%.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(notdir $@)
+# ensure subdirectories in build/ mirror tests/
+$(OBJDIR)/%.o: tests/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# compile test source files to object files in OBJDIR
-$(OBJDIR)/%.o: tests/%.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(notdir $@)
-
-# link the object files to create the final executable
+# link all object files to create final executable
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
-# link the object files for tests
+# link test object files into the test executable
 $(TEST_TARGET): $(TEST_OBJS)
 	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_OBJS)
 

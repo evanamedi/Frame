@@ -58,11 +58,7 @@ char* readConfigFile(const char *configFilePath) {
 	return content;
 }
 
-typedef struct {
-	bool autoStyle;
-	bool foundAutoStyle;
-	char parsedData[1024];
-} ConfigState;
+
 
 ConfigState parseConfig(const char *configContent) {
 	ConfigState state = {false, false, ""};

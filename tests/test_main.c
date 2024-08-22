@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "commands.h"
+#include "test_hashMap.h"
 
 FILE *open_memstream_replacement(const char *input) {
     FILE *tmp = tmpfile();
@@ -84,6 +85,7 @@ int main(int argc, char *argv[]) {
     test_help_command();
     test_new_command(test_dir);
     test_newfile_command(test_dir);
+    //runAllTestsForHashMap();
 
     printf("---All tests passed!---\n\n");
 
