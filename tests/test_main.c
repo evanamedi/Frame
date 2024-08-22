@@ -5,6 +5,13 @@
 #include <sys/stat.h>
 #include "commands.h"
 
+FILE *open_memstream_replacement(const char *input) {
+    FILE *tmp = tmpfile();
+    fwrite(input, 1, strlen(input), tmp);
+    rewind(tmp);
+    return tmp;
+}
+
 void test_help_command() {
     char *args[] = {"frame", "help"};
     handle_command(2, args);
@@ -20,7 +27,7 @@ void test_new_command(const char *test_dir) {
     FILE *stdin_backup = stdin;
     char input[512];
     snprintf(input, sizeof(input), "%s\n%s\n", projectName, mainDir);
-    stdin = fmemopen(input, strlen(input), "r");
+    stdin = open_memstream_replacement(input);
 
     chdir(test_dir);
 
@@ -39,7 +46,7 @@ void test_newfile_command(const char *test_dir) {
     FILE *stdin_backup = stdin;
     char input[512];
     snprintf(input, sizeof(input), "%s\n", filename);
-    stdin = fmemopen(input, strlen(input), "r");
+    stdin = open_memstream_replacement(input);
 
     chdir(test_dir);
     chdir("test_project");
