@@ -3,6 +3,7 @@ CFLAGS = -Wall -Wextra -std=c99 -Iinclude
 
 OBJDIR = build
 TEST_OBJDIR = build_tests
+TEST_DIR = test_dir
 
 SRCS = $(wildcard src/*.c)
 OBJS = $(patsubst src/%.c,$(OBJDIR)/%.o,$(SRCS))
@@ -35,7 +36,9 @@ $(TEST_TARGET): $(TEST_OBJS)
 	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_OBJS)
 
 run: $(TEST_TARGET)
-	./$(TEST_TARGET)
+	@mkdir -p $(TEST_DIR)
+	./$(TEST_TARGET) $(TEST_DIR)
+	@rm -rf $(TEST_DIR)
 
 clean:
-	rm -rf $(TARGET) $(OBJDIR) $(TEST_OBJDIR)
+	rm -rf $(TARGET) $(OBJDIR) $(TEST_OBJDIR) $(TEST_DIR)
