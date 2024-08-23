@@ -1,5 +1,5 @@
 # Frame
-a command-line tool for setting up and managing C projects
+Unix command-line tool for setting up and managing C projects
 
 ## Features
 - Automated Makefile generation
@@ -7,6 +7,7 @@ a command-line tool for setting up and managing C projects
 - Code skeleton creation
 - Module and header file generation
 - Code style enforcement
+- Custom data structures
 
 ## Getting Started
 run:
@@ -20,9 +21,7 @@ or
 bash <(wget -qO- https://raw.githubusercontent.com/evanamedi/Frame/main/install.sh)
 ```
 ## Usage
-examples of how to use the tool
 
 ## Contributing
-project contribution guidelines
 
 ## License
